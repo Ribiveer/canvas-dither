@@ -39,24 +39,29 @@ SOFTWARE.
 	let c = document.getElementById("dithered-background");
 	let ctx = c.getContext('2d');
 
+	let backgroundData = [];
+	backgroundData.height = 0;
+
 	function updateBackground()
 	{
-		c.height = window.innerHeight;
 		c.width = window.innerWidth;
-		
-		let backgroundData = ctx.createImageData(8, c.height);
-		for(let y = 0; y < c.height; y++)
+		if(backgroundData.height != window.innerHeight)
 		{
-			let heightPercentage = y / c.height * 63;
-			for(let x = 0; x < backgroundData.width; x++)
+			c.height = window.innerHeight;
+			backgroundData = ctx.createImageData(8, c.height);
+			for(let y = 0; y < c.height; y++)
 			{
-				let threshold = bayerMatrix[y%8*8+x%8];
-				let letThrough = heightPercentage < threshold;
-				let pixelIndex = (y * backgroundData.width + x) * 4;
-				backgroundData.data[pixelIndex+0] = letThrough?col1.r:col2.r;
-				backgroundData.data[pixelIndex+1] = letThrough?col1.g:col2.g;
-				backgroundData.data[pixelIndex+2] = letThrough?col1.b:col2.b;
-				backgroundData.data[pixelIndex+3] = 255;
+				let heightPercentage = y / c.height * 63;
+				for(let x = 0; x < backgroundData.width; x++)
+				{
+					let threshold = bayerMatrix[y%8*8+x%8];
+					let letThrough = heightPercentage < threshold;
+					let pixelIndex = (y * backgroundData.width + x) * 4;
+					backgroundData.data[pixelIndex+0] = letThrough?col1.r:col2.r;
+					backgroundData.data[pixelIndex+1] = letThrough?col1.g:col2.g;
+					backgroundData.data[pixelIndex+2] = letThrough?col1.b:col2.b;
+					backgroundData.data[pixelIndex+3] = 255;
+				}
 			}
 		}
 		for(let i = 0; i < c.width / backgroundData.width; i++)
